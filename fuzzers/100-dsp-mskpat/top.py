@@ -1,6 +1,7 @@
 import os
 import random
 import json
+import re
 random.seed(int(os.getenv("SEED"), 16))
 from prjxray import util
 from prjxray import verilog
@@ -28,6 +29,17 @@ def fuzz(*args):
         # Otherwise make a random choice
         return random.choice(*args)
 
+def sorter(element):
+    site = element[1]
+    match = re.search(r'X(\d+)Y(\d+)', site)
+
+    if not match:
+        raise ValueError('Something went wrong sorting site %s' % (site))
+
+    x = int(match.group(1))
+    y = int(match.group(2))
+
+    return (x * 60) + y
 
 def run():
     verilog.top_harness(48, 48)
@@ -38,6 +50,9 @@ def run():
     data['instances'] = []
 
     sites = list(gen_sites())
+
+    # Sort sites by location: X, followed by Y.
+    sites.sort(key = sorter)
 
     for i, (tile, site) in enumerate(sites):
 
