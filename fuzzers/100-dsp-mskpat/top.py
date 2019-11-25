@@ -29,8 +29,8 @@ def fuzz(*args):
         # Otherwise make a random choice
         return random.choice(*args)
 
-def sorter(element):
-    site = element[1]
+
+def site_xy(site):
     match = re.search(r'X(\d+)Y(\d+)', site)
 
     if not match:
@@ -39,7 +39,14 @@ def sorter(element):
     x = int(match.group(1))
     y = int(match.group(2))
 
+    return x, y
+
+
+def sorter(element):
+    site = element[1]
+    x, y = site_xy(site)
     return (x * 60) + y
+
 
 def run():
     verilog.top_harness(48, 48)
